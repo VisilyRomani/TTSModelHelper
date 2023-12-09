@@ -1,6 +1,6 @@
 import Database from "tauri-plugin-sql-api";
 
-export const db = await Database.load("sqlite:test.db");
+export const db = await Database.load("sqlite:database.db");
 
 await db.execute(
     `CREATE TABLE IF NOT EXISTS model (
@@ -8,9 +8,10 @@ await db.execute(
         name TEXT
     )`
 );
+
 await db.execute(
     `CREATE TABLE IF NOT EXISTS audio (
-        audio_id INTEGER PRIMARY KEY AUTOINCREMENT PRIMARY KEY,
+        audio_id INTEGER PRIMARY KEY AUTOINCREMENT,
         model_id INTEGER, 
         audio BLOB,
         transcript TEXT,
