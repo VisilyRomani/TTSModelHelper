@@ -1,3 +1,4 @@
+import { BaseDirectory, createDir } from "@tauri-apps/api/fs";
 import { db } from "./db";
 
 export type TModel = { id: number; name: string }[];
@@ -5,19 +6,23 @@ export type TModel = { id: number; name: string }[];
 export type TAudio = {
   audio_id: number;
   model_id: number;
-  audio: Blob;
+  audio_path: string | null;
   transcript: string;
-  audio_name: string;
 };
-
-import { model_store } from "../lib/stores/model";
 
 export const model = {
   createModel: async (input: string) => {
     if (input) {
+      try {
+        await createDir(input, {
+          dir: BaseDirectory.AppData,
+          recursive: true,
+        });
+      } catch (e) {
+        console.log(e);
+      }
       return await db.execute(
-        `
-        INSERT INTO model (name)
+        `INSERT INTO model (name)
         VALUES (?)`,
         [input]
       );
@@ -55,5 +60,15 @@ export const audio = {
       );
     });
     return await Promise.all(audioPromise);
+  },
+  updateAudioFile: async (
+    audio_path: string,
+    audio_id: number,
+    model_id: number
+  ) => {
+    return await db.execute(
+      `UPDATE audio SET audio=$1 WHERE audio_id=$2 and model_id=$3`,
+      [audio_path, audio_id, model_id]
+    );
   },
 };

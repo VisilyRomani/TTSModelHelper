@@ -27,7 +27,7 @@
 <div>
   <input bind:value={input} />
   <button type="button" on:click={modelCreator}>Create</button>
-  <button type="button" on:click={deleteModels}>Delete</button>
+  <button type="button" on:click={deleteModels}>Delete All Models</button>
 </div>
 <div class="model-container">
   {#each data as model}

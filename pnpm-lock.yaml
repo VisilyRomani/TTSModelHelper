@@ -11,6 +11,9 @@ dependencies:
   tauri-plugin-sql-api:
     specifier: github:tauri-apps/tauri-plugin-sql#v1
     version: github.com/tauri-apps/tauri-plugin-sql/cf80d013a6ea34ee3ca74e4968a1632e87ba0de2
+  wavesurfer.js:
+    specifier: ^7.5.2
+    version: 7.5.2
 
 devDependencies:
   '@sveltejs/vite-plugin-svelte':
@@ -22,6 +25,9 @@ devDependencies:
   '@tsconfig/svelte':
     specifier: ^5.0.0
     version: 5.0.2
+  '@types/audioworklet':
+    specifier: ^0.0.52
+    version: 0.0.52
   svelte:
     specifier: ^4.0.5
     version: 4.2.8
@@ -447,6 +453,10 @@ packages:
 
   /@tsconfig/svelte@5.0.2:
     resolution: {integrity: sha512-BRbo1fOtyVbhfLyuCWw6wAWp+U8UQle+ZXu84MYYWzYSEB28dyfnRBIE99eoG+qdAC0po6L2ScIEivcT07UaMA==}
+    dev: true
+
+  /@types/audioworklet@0.0.52:
+    resolution: {integrity: sha512-+C0QA8HJS07NjSdLFUDsSfUGJiLs+FPa6K7Tu/e76dqHEnuTOjAjDyiFOnZTuf9j4x9P8Nmv0OOfcMNYnGzbAQ==}
     dev: true
 
   /@types/estree@1.0.5:
@@ -1096,6 +1106,10 @@ packages:
     dependencies:
       vite: 4.5.1
     dev: true
+
+  /wavesurfer.js@7.5.2:
+    resolution: {integrity: sha512-hgO8p0MXxJ6oLm367jsjujve6QNEqt1B+T7muvXtMWWDn08efZ2DrVw6xaUI9NiX3Lo7BNYu9lPKnE5jubjoOg==}
+    dev: false
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}

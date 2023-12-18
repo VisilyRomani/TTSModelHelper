@@ -13,7 +13,7 @@ await db.execute(
   `CREATE TABLE IF NOT EXISTS audio (
         audio_id INTEGER PRIMARY KEY AUTOINCREMENT,
         model_id INTEGER, 
-        audio BLOB,
+        audio_path TEXT,
         transcript TEXT
       )`
 );

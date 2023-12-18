@@ -2,21 +2,63 @@
   import { onMount } from "svelte";
   import { audio, type TAudio } from "../database/db_functions";
   import { model_store } from "./stores/model";
-  let audioData: TAudio[] = [];
+  import WaveSurfer from "wavesurfer.js";
+  import RecordPlugin from "wavesurfer.js/dist/plugins/record.js";
+  import Play from "./icons/play.svelte";
+  import Pause from "./icons/pause.svelte";
+  import RecordActive from "./icons/record_active.svelte";
+  import RecordInactive from "./icons/record_inactive.svelte";
+  import { writeAudioFile } from "./file/read_write_audio";
 
   let selectedAudio: TAudio;
+  let audioData: TAudio[] = [];
+  let wavesurfer: WaveSurfer;
+  let record: RecordPlugin;
 
+  $: isRecording = false;
   onMount(async () => {
+    // gets all transcript data
     if ($model_store) {
       audioData = await audio.getAudio($model_store);
+      console.log(audioData);
     }
-    console.log(await checkMic());
+    createWaveSurfer(null);
   });
 
-  const checkMic = () => {
-    if (window.navigator.mediaDevices) {
-      return window.navigator.mediaDevices.getUserMedia({ audio: true });
+  $: selectedAudio && createWaveSurfer(selectedAudio);
+
+  const createWaveSurfer = (savedAudio: TAudio | null) => {
+    // setup wavesurfer
+    if (wavesurfer) {
+      wavesurfer.destroy();
     }
+
+    wavesurfer = WaveSurfer.create({
+      container: "#mic",
+      waveColor: "#a6edff",
+      progressColor: "#498e9e",
+    });
+
+    record = wavesurfer.registerPlugin(
+      RecordPlugin.create({
+        scrollingWaveform: true,
+        renderRecordedAudio: false,
+      })
+    );
+
+    record.on("record-end", async (blob) => {
+      if (selectedAudio.model_id) {
+        writeAudioFile(blob, selectedAudio.audio_id, selectedAudio.model_id);
+      }
+      wavesurfer.destroy();
+      wavesurfer = WaveSurfer.create({
+        container: "#mic",
+        waveColor: "#a6edff",
+        progressColor: "#498e9e",
+        url: URL.createObjectURL(blob),
+      });
+      return;
+    });
   };
 
   const handleTextFile = (e: Event) => {
@@ -39,6 +81,33 @@
       }
     }
   };
+
+  const handleRecordPause = () => {
+    if (record.isPaused()) {
+      record.resumeRecording();
+    } else {
+      record.pauseRecording();
+    }
+  };
+
+  const handleRecordStart = () => {
+    if (record.isRecording() || record.isPaused()) {
+      isRecording = false;
+      record.stopRecording();
+    } else {
+      isRecording = true;
+      createWaveSurfer(null);
+      record.startRecording();
+    }
+  };
+
+  const recordPlayback = () => {
+    if (wavesurfer.isPlaying()) {
+      wavesurfer.pause();
+    } else {
+      wavesurfer.play();
+    }
+  };
 </script>
 
 <div class="window-container">
@@ -49,20 +118,56 @@
     </label>
     <div class="audio-continer">
       {#each audioData as line}
-        <button type="button" on:click={() => (selectedAudio = line)}
+        <button
+          type="button"
+          on:click={async () => {
+            if ($model_store) {
+              audioData = await audio.getAudio($model_store);
+            }
+            selectedAudio = line;
+          }}
+          class={selectedAudio?.audio_id === line?.audio_id ? "selected" : ""}
           >{line.transcript}</button
         >
       {/each}
     </div>
   </div>
+
   <div class="audio">
-    {#if selectedAudio?.audio_id}
-      <h2>{selectedAudio.transcript}</h2>
+    {#if selectedAudio}
+      <h2>
+        {selectedAudio?.transcript}
+      </h2>
     {/if}
+    <div
+      id="mic"
+      style="border: 1px solid #ddd; border-radius: 4px; margin: 1rem"
+    />
+    <div class="controls">
+      <button type="button" on:click={recordPlayback}>
+        <Play />
+      </button>
+
+      <button type="button" on:click={handleRecordStart}>
+        {#if isRecording}
+          <RecordInactive />
+        {:else}
+          <RecordActive fill="red" />
+        {/if}
+      </button>
+
+      <button type="button" on:click={handleRecordPause}>
+        <Pause />
+      </button>
+    </div>
+    <!-- <button type="button" on:click={handleRecord}>start</button> -->
   </div>
 </div>
 
 <style>
+  .selected {
+    background-color: #b0b0b098;
+  }
   .transcript {
     padding: 1em;
     display: flex;
@@ -85,6 +190,8 @@
   }
   .audio {
     padding: 1em;
+    display: flex;
+    flex-direction: column;
   }
 
   .input-file {
