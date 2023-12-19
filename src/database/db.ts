@@ -10,8 +10,8 @@ await db.execute(
 );
 
 await db.execute(
-  `CREATE TABLE IF NOT EXISTS audio (
-        audio_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  `CREATE TABLE IF NOT EXISTS transcript (
+        transcript_id INTEGER PRIMARY KEY AUTOINCREMENT,
         model_id INTEGER, 
         audio_path TEXT,
         transcript TEXT

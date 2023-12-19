@@ -3,8 +3,8 @@ import { db } from "./db";
 
 export type TModel = { id: number; name: string }[];
 
-export type TAudio = {
-  audio_id: number;
+export type TTranscript = {
+  transcript_id: number;
   model_id: number;
   audio_path: string | null;
   transcript: string;
@@ -41,34 +41,34 @@ export const model = {
   },
 };
 
-export const audio = {
-  getAllAudio: async () => {
-    return await db.select<TAudio[]>(`SELECT * FROM audio`);
+export const transcript = {
+  getAllTranscript: async () => {
+    return await db.select<TTranscript[]>(`SELECT * FROM audio`);
   },
-  getAudio: async (model_id: number) => {
-    return await db.select<TAudio[]>(
-      `SELECT * FROM audio WHERE model_id = $1`,
+  getTranscript: async (model_id: number) => {
+    return await db.select<TTranscript[]>(
+      `SELECT * FROM transcript WHERE model_id = $1`,
       [model_id]
     );
   },
-  importAudio: async (transcript: string[], model_id: number) => {
+  importTranscript: async (transcript: string[], model_id: number) => {
     const audioPromise = transcript.map(async (s) => {
       return await db.execute(
-        `INSERT INTO audio (model_id, transcript)
+        `INSERT INTO transcript (model_id, transcript)
         VALUES(?,?)`,
         [model_id, s]
       );
     });
     return await Promise.all(audioPromise);
   },
-  updateAudioFile: async (
-    audio_path: string,
-    audio_id: number,
-    model_id: number
-  ) => {
-    return await db.execute(
-      `UPDATE audio SET audio=$1 WHERE audio_id=$2 and model_id=$3`,
-      [audio_path, audio_id, model_id]
-    );
-  },
+  // updateTranscript: async (
+  //   audio_path: string,
+  //   audio_id: number,
+  //   model_id: number
+  // ) => {
+  //   return await db.execute(
+  //     `UPDATE Transcript SET audio=$1 WHERE audio_id=$2 and model_id=$3`,
+  //     [audio_path, audio_id, model_id]
+  //   );
+  // },
 };
