@@ -34,6 +34,8 @@
     }
 
     wavesurfer = WaveSurfer.create({
+      sampleRate:22050,
+
       container: "#mic",
       waveColor: "#a6edff",
       progressColor: "#498e9e",
@@ -41,17 +43,21 @@
 
     record = wavesurfer.registerPlugin(
       RecordPlugin.create({
+        mimeType:'audio/webm;codecs=PCM',
+        audioBitsPerSecond:163840,
         scrollingWaveform: true,
         renderRecordedAudio: false,
       })
     );
 
     record.on("record-end", async (blob) => {
-      if (selectedAudio.model_id) {
+      console.log(blob)
+      if (selectedAudio?.model_id) {
         writeAudioFile(blob, selectedAudio.audio_id, selectedAudio.model_id);
       }
       wavesurfer.destroy();
       wavesurfer = WaveSurfer.create({
+        sampleRate:22050,
         container: "#mic",
         waveColor: "#a6edff",
         progressColor: "#498e9e",
@@ -133,7 +139,7 @@
     </div>
   </div>
 
-  <div class="audio">
+  <div class="audio {selectedAudio ?? 'hidden'}" >
     {#if selectedAudio}
       <h2>
         {selectedAudio?.transcript}
@@ -165,6 +171,13 @@
 </div>
 
 <style>
+  
+  .hidden{
+    visibility: hidden;
+  }
+  #mic{
+    background-color: #0f0f0f69;
+  }
   .selected {
     background-color: #b0b0b098;
   }

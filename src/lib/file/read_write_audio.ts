@@ -6,14 +6,14 @@ import {
 
 export const writeAudioFile = async (
   audio: Blob,
-  file_name: string,
-  model_name: string
+  file_name: number,
+  model_name: number
 ) => {
   try {
     await writeBinaryFile(
       {
         contents: new Uint8Array(await audio.arrayBuffer()),
-        path: `model\\${model_name}\\${file_name}.wav`,
+        path: `model\\${model_name}\\${file_name}.webm`,
       },
       { dir: BaseDirectory.AppData }
     );

@@ -14,18 +14,18 @@ export const model = {
   createModel: async (input: string) => {
     if (input) {
       try {
-        await createDir(input, {
+        const model = await db.execute(
+          `INSERT INTO model (name)
+          VALUES (?)`,
+          [input]
+        );
+        await createDir(`model\\${model.lastInsertId}`, {
           dir: BaseDirectory.AppData,
           recursive: true,
         });
       } catch (e) {
         console.log(e);
       }
-      return await db.execute(
-        `INSERT INTO model (name)
-        VALUES (?)`,
-        [input]
-      );
     }
     return [];
   },
