@@ -5,6 +5,7 @@ import {
   exists,
   createDir,
   readDir,
+  removeFile,
 } from "@tauri-apps/api/fs";
 import uniqid from "uniqid";
 import { appDataDir } from "@tauri-apps/api/path";
@@ -38,19 +39,7 @@ export const writeAudioFile = async (
   }
 };
 
-const readAudioFile = async (file_name: string) => {
-  try {
-    const binaryAudio = await readBinaryFile(file_name, {
-      dir: BaseDirectory.Resource,
-    });
-
-    return new Blob([binaryAudio], { type: "audio/webm;codecs=opus" });
-  } catch (e) {
-    console.log(e);
-  }
-};
-
-export const getRecordedAudio = async (
+export const getAllRecordedAudio = async (
   model: number | undefined,
   transcript_id: number | undefined
 ) => {
@@ -70,6 +59,32 @@ export const getRecordedAudio = async (
     // happens when no recordings
     console.error(e);
   }
-  console.log(directories);
   return directories;
+};
+
+// currently when save it is in 8bit might need to change to 16 bit
+// const signed16BitArray = unsigned8BitArray.map(x => (x + 128) & 0xFF - 128);
+
+export const getRecordedAudio = async (
+  path: string | undefined
+): Promise<Blob | undefined> => {
+  try {
+    if (!path) {
+      return undefined;
+    }
+    const binaryAudio = await readBinaryFile(path);
+
+    return new Blob([binaryAudio.buffer], { type: "audio/webm;codecs=PCM" });
+  } catch (e) {
+    console.log(e);
+  }
+  return undefined;
+};
+
+export const deleteRecordedAudio = async (path: string) => {
+  try {
+    await removeFile(path);
+  } catch (e) {
+    console.error(e);
+  }
 };

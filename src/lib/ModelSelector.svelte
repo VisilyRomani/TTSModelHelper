@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { model, type TModel } from "../database/db_functions";
+  import { model, type TModel } from "./functions/db_functions";
   import { model_store } from "./stores/model";
   let input = "";
   let data: TModel = [];

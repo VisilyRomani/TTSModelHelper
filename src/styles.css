@@ -18,10 +18,6 @@
   height: 100%;
 }
 
-.hidden {
-  visibility: hidden;
-}
-
 html, body {
   height: 100vh;
   overflow: hidden;

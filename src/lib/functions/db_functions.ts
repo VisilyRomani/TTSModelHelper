@@ -1,5 +1,5 @@
 import { BaseDirectory, createDir } from "@tauri-apps/api/fs";
-import { db } from "./db";
+import { db } from "../../database/db";
 
 export type TModel = { id: number; name: string }[];
 

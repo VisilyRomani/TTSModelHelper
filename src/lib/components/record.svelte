@@ -1,35 +1,40 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import WaveSurfer from "wavesurfer.js";
   import RecordPlugin from "wavesurfer.js/dist/plugins/record.js";
   import Pause from "../icons/pause.svelte";
   import RecordActive from "../icons/record_active.svelte";
   import RecordInactive from "../icons/record_inactive.svelte";
   import Play from "../icons/play.svelte";
-  import { type TTranscript } from "../../database/db_functions";
-  import { writeAudioFile } from "../file/read_write_audio";
+  import { type TTranscript } from "./../functions/db_functions";
+  import { writeAudioFile } from "../functions/read_write_audio";
 
   export let selectedTranscript: TTranscript;
+  export let audio: Blob | undefined;
   let isRecording = false;
   let wavesurfer: WaveSurfer;
   let record: RecordPlugin;
 
   onMount(() => {
-    createWaveSurfer();
+    createWaveSurfer(undefined);
   });
 
-  const createWaveSurfer = () => {
-    // setup wavesurfer
+  const { getAudio } = getContext<{
+    getAudio: () => Promise<void>;
+  }>("refetch");
+
+  const createWaveSurfer = async (audio: Blob | undefined) => {
     if (wavesurfer) {
       wavesurfer.destroy();
     }
 
     wavesurfer = WaveSurfer.create({
       sampleRate: 22050,
-
       container: "#mic",
       waveColor: "#a6edff",
       progressColor: "#498e9e",
+      normalize: true,
+      url: audio ? URL.createObjectURL(audio) : undefined,
     });
 
     record = wavesurfer.registerPlugin(
@@ -42,25 +47,29 @@
     );
 
     record.on("record-end", async (blob) => {
-      console.log(blob);
       if (selectedTranscript.model_id) {
-        writeAudioFile(
+        await writeAudioFile(
           blob,
           selectedTranscript.transcript_id,
           selectedTranscript.model_id
         );
+        await getAudio();
       }
-      wavesurfer.destroy();
-      wavesurfer = WaveSurfer.create({
-        sampleRate: 22050,
-        container: "#mic",
-        waveColor: "#a6edff",
-        progressColor: "#498e9e",
-        url: URL.createObjectURL(blob),
-      });
-      return;
+      if (wavesurfer) {
+        wavesurfer.destroy();
+      }
+      // wavesurfer = WaveSurfer.create({
+      //   sampleRate: 22050,
+      //   container: "#mic",
+      //   normalize: true,
+      //   waveColor: "#a6edff",
+      //   progressColor: "#498e9e",
+      //   url: URL.createObjectURL(blob),
+      // });
     });
   };
+
+  $: createWaveSurfer(audio);
 
   const handleRecordPause = () => {
     if (record.isPaused()) {
@@ -76,7 +85,7 @@
       record.stopRecording();
     } else {
       isRecording = true;
-      createWaveSurfer();
+      createWaveSurfer(undefined);
       record.startRecording();
     }
   };
@@ -96,10 +105,7 @@
       {selectedTranscript.transcript}
     </h2>
   {/if}
-  <div
-    id="mic"
-    style="border: 1px solid #ddd; border-radius: 4px; margin: 1rem"
-  />
+  <div id="mic" />
   <div class="controls">
     <button type="button" on:click={recordPlayback}>
       <Play />
@@ -122,6 +128,9 @@
 <style>
   #mic {
     background-color: #0f0f0f69;
+    border-radius: 4px;
+    margin: 1rem;
+    height: 128px;
   }
   .audio {
     display: flex;

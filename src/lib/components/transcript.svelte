@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { transcript, type TTranscript } from "../../database/db_functions";
+  import { transcript, type TTranscript } from "../functions/db_functions";
   import { model_store } from "../stores/model";
 
   export let selectedTranscript: TTranscript | null;
