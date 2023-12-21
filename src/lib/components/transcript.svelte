@@ -33,7 +33,7 @@
     <input type="file" accept=" .txt" on:change={handleTextFile} />
   </label>
   <div class="transcript-continer">
-    {#each transcriptList as line}
+    {#each transcriptList as line, idx (idx)}
       <button
         type="button"
         on:click={async () => {
@@ -44,7 +44,9 @@
         }}
         class={selectedTranscript?.transcript_id === line?.transcript_id
           ? "selected"
-          : ""}>{line.transcript}</button
+          : ""}
+      >
+        {idx}. {line.transcript}</button
       >
     {/each}
   </div>
@@ -90,5 +92,8 @@
   }
   .selected {
     background-color: #b0b0b098;
+  }
+  button {
+    text-align: left;
   }
 </style>

@@ -6,7 +6,7 @@ export type TModel = { id: number; name: string }[];
 export type TTranscript = {
   transcript_id: number;
   model_id: number;
-  audio_path: string | null;
+  selected_audio: string | null;
   transcript: string;
 };
 
@@ -42,9 +42,6 @@ export const model = {
 };
 
 export const transcript = {
-  getAllTranscript: async () => {
-    return await db.select<TTranscript[]>(`SELECT * FROM audio`);
-  },
   getTranscript: async (model_id: number) => {
     return await db.select<TTranscript[]>(
       `SELECT * FROM transcript WHERE model_id = $1`,
