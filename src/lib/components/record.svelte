@@ -6,22 +6,26 @@
   import RecordActive from "../icons/record_active.svelte";
   import RecordInactive from "../icons/record_inactive.svelte";
   import Play from "../icons/play.svelte";
-  import { type TTranscript } from "./../functions/db_functions";
-  import { writeAudioFile } from "../functions/read_write_audio";
+  import { selected_transcript } from "../stores/selected-transcript";
+  import { writeAudioFile } from "../util/audio.";
+  import { transcode } from "../ffmpeg/ffmpeg";
 
-  export let selectedTranscript: TTranscript;
   export let audio: Blob | undefined;
   let isRecording = false;
   let wavesurfer: WaveSurfer;
   let record: RecordPlugin;
 
+  let testAudio: Blob;
+  $: testAudio;
+  $: console.log($selected_transcript);
+
   onMount(() => {
     createWaveSurfer(undefined);
   });
 
-  const { getAudio } = getContext<{
-    getAudio: () => Promise<void>;
-  }>("refetch");
+  // const { getAudio } = getContext<{
+  //   getAudio: () => Promise<void>;
+  // }>("refetch");
 
   const createWaveSurfer = async (audio: Blob | undefined) => {
     if (wavesurfer) {
@@ -33,27 +37,29 @@
       container: "#mic",
       waveColor: "#a6edff",
       progressColor: "#498e9e",
-      normalize: true,
       url: audio ? URL.createObjectURL(audio) : undefined,
     });
 
     record = wavesurfer.registerPlugin(
       RecordPlugin.create({
-        mimeType: "audio/webm;codecs=PCM",
-        audioBitsPerSecond: 163840,
+        // mimeType: "audio/webm;codecs=PCM",
+        // audioBitsPerSecond: 163840,
         scrollingWaveform: true,
         renderRecordedAudio: false,
       })
     );
 
     record.on("record-end", async (blob) => {
-      if (selectedTranscript.model_id) {
-        await writeAudioFile(
-          blob,
-          selectedTranscript.transcript_id,
-          selectedTranscript.model_id
-        );
-        await getAudio();
+      if ($selected_transcript.model_id) {
+        // await writeAudioFile(
+        //   blob,
+        //   $selected_transcript.transcript_id,
+        //   $selected_transcript.model_id
+        // );
+        console.log("blob", blob);
+        const wav = await transcode(blob);
+        console.log("wav", wav);
+        testAudio = wav;
       }
       if (wavesurfer) {
         wavesurfer.destroy();
@@ -61,7 +67,6 @@
       // wavesurfer = WaveSurfer.create({
       //   sampleRate: 22050,
       //   container: "#mic",
-      //   normalize: true,
       //   waveColor: "#a6edff",
       //   progressColor: "#498e9e",
       //   url: URL.createObjectURL(blob),
@@ -69,7 +74,9 @@
     });
   };
 
-  $: createWaveSurfer(audio);
+  $: if (window.document && audio) {
+    createWaveSurfer(audio);
+  }
 
   const handleRecordPause = () => {
     if (record.isPaused()) {
@@ -100,9 +107,9 @@
 </script>
 
 <div class="audio">
-  {#if selectedTranscript}
+  {#if $selected_transcript}
     <h2>
-      {selectedTranscript.transcript}
+      {$selected_transcript.transcript}
     </h2>
   {/if}
   <div id="mic" />
@@ -124,6 +131,11 @@
     </button>
   </div>
 </div>
+{#if testAudio}
+  <audio controls src={URL.createObjectURL(testAudio)}></audio>
+{:else}
+  nothing
+{/if}
 
 <style>
   #mic {

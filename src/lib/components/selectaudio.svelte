@@ -1,18 +1,26 @@
 <script lang="ts">
-  import { audioFiles } from "../stores/audioFile";
   import Trash from "../icons/delete.svelte";
-  import { deleteRecordedAudio } from "../functions/read_write_audio";
   export let selectedAudioPath: string | undefined;
-  import { getContext } from "svelte";
+  import { deleteRecordedAudio, getAllRecordedAudio } from "../util/audio.";
+  import { selected_transcript } from "../stores/selected-transcript";
 
-  const { getAudio } = getContext<{
-    getAudio: () => Promise<void>;
-  }>("refetch");
+  let audioFiles: { name?: string; path: string }[] = [];
+
+  const getAudio = async () => {
+    audioFiles = await getAllRecordedAudio(
+      $selected_transcript.model_id,
+      $selected_transcript?.transcript_id
+    );
+  };
+  $selected_transcript && getAudio()
 </script>
 
 <div class="container">
   <div class="audio-list">
-    {#each $audioFiles as file}
+    {#if audioFiles.length === 0}
+      <h4>No Audio Files</h4>
+    {/if}
+    {#each audioFiles as file}
       <div class="file-item {selectedAudioPath === file.path ? 'active' : ''}">
         <div>
           <button

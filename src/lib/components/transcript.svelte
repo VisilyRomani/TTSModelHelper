@@ -1,9 +1,7 @@
 <script lang="ts">
-  import { transcript, type TTranscript } from "../functions/db_functions";
-  import { model_store } from "../stores/model";
-
-  export let selectedTranscript: TTranscript | null;
-  export let transcriptList: TTranscript[] = [];
+  import { model_store } from "../stores/selected-model";
+  import { getTranscript, importTranscript } from "../util/transcript";
+import { selected_transcript } from "../stores/selected-transcript";
 
   const handleTextFile = (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
@@ -16,8 +14,9 @@
           .map((s) => s.trim())
           .filter((s) => !!s);
         if ($model_store) {
-          await transcript.importTranscript(trans, $model_store);
-          transcriptList = await transcript.getTranscript($model_store);
+           await importTranscript(trans, $model_store.id);
+          const transcript = await getTranscript($model_store.id)
+          model_store.set({...$model_store, transcript:transcript})
         }
       };
       if (e.target.files?.length) {
@@ -25,6 +24,7 @@
       }
     }
   };
+  $: transcript = $model_store.transcript
 </script>
 
 <div class="transcript">
@@ -33,16 +33,13 @@
     <input type="file" accept=" .txt" on:change={handleTextFile} />
   </label>
   <div class="transcript-continer">
-    {#each transcriptList as line, idx (idx)}
+    {#each transcript as line, idx (idx)}
       <button
         type="button"
         on:click={async () => {
-          if ($model_store) {
-            transcriptList = await transcript.getTranscript($model_store);
-          }
-          selectedTranscript = line;
+          selected_transcript.set(line)
         }}
-        class={selectedTranscript?.transcript_id === line?.transcript_id
+        class={$selected_transcript?.transcript_id === line?.transcript_id
           ? "selected"
           : ""}
       >

@@ -1,26 +1,31 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { model, type TModel } from "./functions/db_functions";
-  import { model_store } from "./stores/model";
+  import { model_store } from "./stores/selected-model";
+  import { getTranscript } from "./util/transcript";
+  import { clearModels, createModel, getModels, type TModel } from "./util/model";
   let input = "";
-  let data: TModel = [];
+  let data: TModel[] = [];
+
   onMount(async () => {
-    data = await model.getModels();
+    data = await getModels();
   });
 
   const modelCreator = async () => {
-    await model.createModel(input);
-    data = await model.getModels();
+    await createModel(input);
+    data = await getModels();
     input = "";
   };
 
   const deleteModels = async () => {
-    await model.clearModels();
-    data = await model.getModels();
+    await clearModels();
+    data = await getModels();
+    console.log(data)
+    
   };
 
-  const assignModel = (model_id: number) => {
-    model_store.set(model_id);
+  const assignModel = async (model:TModel) => {
+    const transcripts = await getTranscript(model.id)
+    model_store.set({...model, transcript:transcripts});
   };
 </script>
 
@@ -34,7 +39,7 @@
     <button
       class="model-selector"
       type="button"
-      on:click={() => assignModel(model.id)}
+      on:click={() => assignModel(model)}
     >
       {model.name}
     </button>

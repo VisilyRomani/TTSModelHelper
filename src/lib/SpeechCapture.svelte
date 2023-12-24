@@ -1,49 +1,26 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte";
-  import { transcript, type TTranscript } from "./functions/db_functions";
   import Transcript from "./components/transcript.svelte";
-  import { model_store } from "./stores/model";
+  import { model_store } from "./stores/selected-model";
   import Record from "./components/record.svelte";
-  import {
-    getAllRecordedAudio,
-    getRecordedAudio,
-  } from "./functions/read_write_audio";
   import SelectAudio from "./components/selectaudio.svelte";
-  import { audioFiles } from "./stores/audioFile";
-  let selectedTranscript: TTranscript;
-  let selectedAudioPath: string | undefined;
-  let transcriptList: TTranscript[] = [];
+  import { selected_transcript } from "./stores/selected-transcript";
+  import { getRecordedAudio } from "./util/audio.";
+  let selectedAudioPath = $selected_transcript?.selected_audio_path || undefined
   let audio: Blob | undefined;
-
-  onMount(async () => {
-    if ($model_store) {
-      transcriptList = await transcript.getTranscript($model_store);
-    }
-  });
 
   const audioAsync = async () => {
     audio = await getRecordedAudio(selectedAudioPath);
   };
 
-  const getAudio = async () => {
-    audioFiles.set(
-      await getAllRecordedAudio($model_store, selectedTranscript?.transcript_id)
-    );
-    audio = undefined;
-    selectedAudioPath = undefined;
-  };
-
-  setContext("refetch", { getAudio });
-
   $: selectedAudioPath && audioAsync();
-  $: selectedTranscript && getAudio();
 </script>
 
 <div class="window-container">
-  <Transcript {transcriptList} bind:selectedTranscript />
+  <Transcript />
   <div class="cont">
-    {#if selectedTranscript}
-      <Record bind:selectedTranscript bind:audio />
+    {#if $selected_transcript.transcript_id}
+      <Record bind:audio />
       <SelectAudio bind:selectedAudioPath />
     {/if}
   </div>
