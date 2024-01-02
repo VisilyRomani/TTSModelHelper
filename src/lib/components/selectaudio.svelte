@@ -3,6 +3,7 @@
   export let selectedAudioPath: string | undefined;
   import { deleteRecordedAudio, getAllRecordedAudio } from "../util/audio.";
   import { selected_transcript } from "../stores/selected-transcript";
+  import { updateAudioPath } from "../util/transcript";
 
   let audioFiles: { name?: string; path: string }[] = [];
 
@@ -12,7 +13,7 @@
       $selected_transcript?.transcript_id
     );
   };
-  $selected_transcript && getAudio()
+  $: $selected_transcript && getAudio()
 </script>
 
 <div class="container">
@@ -25,7 +26,10 @@
         <div>
           <button
             type="button"
-            on:click={() => (selectedAudioPath = file.path)}
+            on:click={() => {
+              updateAudioPath(file.path, $selected_transcript.transcript_id)
+              selectedAudioPath = file.path
+              }}
           >
             Select
           </button>

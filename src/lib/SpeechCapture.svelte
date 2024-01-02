@@ -6,7 +6,7 @@
   import SelectAudio from "./components/selectaudio.svelte";
   import { selected_transcript } from "./stores/selected-transcript";
   import { getRecordedAudio } from "./util/audio.";
-  let selectedAudioPath = $selected_transcript?.selected_audio_path || undefined
+  let selectedAudioPath = $selected_transcript?.selected_audio_path;
   let audio: Blob | undefined;
 
   const audioAsync = async () => {

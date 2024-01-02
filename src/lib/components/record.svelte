@@ -15,17 +15,10 @@
   let wavesurfer: WaveSurfer;
   let record: RecordPlugin;
 
-  let testAudio: Blob;
-  $: testAudio;
-  $: console.log($selected_transcript);
-
   onMount(() => {
     createWaveSurfer(undefined);
   });
 
-  // const { getAudio } = getContext<{
-  //   getAudio: () => Promise<void>;
-  // }>("refetch");
 
   const createWaveSurfer = async (audio: Blob | undefined) => {
     if (wavesurfer) {
@@ -42,8 +35,6 @@
 
     record = wavesurfer.registerPlugin(
       RecordPlugin.create({
-        // mimeType: "audio/webm;codecs=PCM",
-        // audioBitsPerSecond: 163840,
         scrollingWaveform: true,
         renderRecordedAudio: false,
       })
@@ -51,26 +42,23 @@
 
     record.on("record-end", async (blob) => {
       if ($selected_transcript.model_id) {
-        // await writeAudioFile(
-        //   blob,
-        //   $selected_transcript.transcript_id,
-        //   $selected_transcript.model_id
-        // );
-        console.log("blob", blob);
+        await writeAudioFile(
+          blob,
+          $selected_transcript.transcript_id,
+          $selected_transcript.model_id
+        );
         const wav = await transcode(blob);
-        console.log("wav", wav);
-        testAudio = wav;
+        if (wavesurfer) {
+          wavesurfer.destroy();
+        }
+        wavesurfer = WaveSurfer.create({
+          sampleRate: 22050,
+          container: "#mic",
+          waveColor: "#a6edff",
+          progressColor: "#498e9e",
+          url: URL.createObjectURL(blob),
+        });
       }
-      if (wavesurfer) {
-        wavesurfer.destroy();
-      }
-      // wavesurfer = WaveSurfer.create({
-      //   sampleRate: 22050,
-      //   container: "#mic",
-      //   waveColor: "#a6edff",
-      //   progressColor: "#498e9e",
-      //   url: URL.createObjectURL(blob),
-      // });
     });
   };
 
@@ -131,11 +119,6 @@
     </button>
   </div>
 </div>
-{#if testAudio}
-  <audio controls src={URL.createObjectURL(testAudio)}></audio>
-{:else}
-  nothing
-{/if}
 
 <style>
   #mic {

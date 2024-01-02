@@ -21,10 +21,9 @@ const load = async () => {
 
 export const transcode = async (audioFile: Blob): Promise<Blob> => {
     if (ffmpeg) {
-    console.log("transcode starting");
-    ffmpeg.on("log", (e) => {
-      console.log(e.message);
-    });
+    // ffmpeg.on("log", (e) => {
+    //   console.log(e.message);
+    // });
 
     ffmpeg.on("progress", (e) => {
       console.log(e.progress);
@@ -42,8 +41,6 @@ export const transcode = async (audioFile: Blob): Promise<Blob> => {
       "output.wav",
     ]);
     const output = await ffmpeg.readFile("output.wav") as Uint8Array
-    console.log(output)
-    await writeBinaryFile('test.wav',output.buffer, {dir:BaseDirectory.AppData})
     return new Blob([output.buffer],{type:'audio/wav; codecs=MS_PCM'});
 } else {
     await load();

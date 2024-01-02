@@ -28,3 +28,11 @@ export const importTranscript = async (
   });
   return await Promise.all(audioPromise);
 };
+
+export const updateAudioPath = async (path:string, transcript_id:string) => {
+  return await db.execute(`
+    UPDATE transcript 
+      SET selected_audio_path = $1
+      WHERE transcript_id = $2
+  `, [path, transcript_id ])
+}

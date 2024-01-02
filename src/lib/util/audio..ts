@@ -21,11 +21,11 @@ export const writeAudioFile = async (
       await writeBinaryFile(
         {
           contents: new Uint8Array(await audio.arrayBuffer()),
-          path: `model\\${model_id}\\${transcript_id}\\${audioId}.webm`,
+          path: `model\\${model_id}\\${transcript_id}\\${audioId}.wav`,
         },
         { dir: BaseDirectory.AppData }
       );
-      return `model\\${model_id}\\${transcript_id}\\${audioId}.webm`;
+      return `model\\${model_id}\\${transcript_id}\\${audioId}.wav`;
     } catch (e) {
       console.log(e);
     }
