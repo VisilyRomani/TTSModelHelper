@@ -2,12 +2,15 @@
   import ModelSelector from "./lib/ModelSelector.svelte";
   import SpeechCapture from "./lib/SpeechCapture.svelte";
   import { model_store } from "./lib/stores/selected-model";
-$:console.log($model_store)
 </script>
 
 <main class="container">
   {#if $model_store?.id}
-    <button type="button" id="back" on:click={() => model_store.set({id:'',name:'',transcript:[]})}>
+    <button
+      type="button"
+      id="back"
+      on:click={() => model_store.set({ id: "", name: "", transcript: [] })}
+    >
       Back
     </button>
   {/if}

@@ -1,27 +1,68 @@
 <script lang="ts">
-  import { onMount, setContext } from "svelte";
   import Transcript from "./components/transcript.svelte";
-  import { model_store } from "./stores/selected-model";
   import Record from "./components/record.svelte";
   import SelectAudio from "./components/selectaudio.svelte";
   import { selected_transcript } from "./stores/selected-transcript";
-  import { getRecordedAudio } from "./util/audio.";
-  let selectedAudioPath = $selected_transcript?.selected_audio_path;
-  let audio: Blob | undefined;
+  import {
+    getAllRecordedAudio,
+    getRecordedAudio,
+    type TAudio,
+  } from "./util/audio.";
+  import { updateAudioPath } from "./util/transcript";
+  import { model_store } from "./stores/selected-model";
+  let selectedAudio: { path?: string; data?: Blob };
+  let audioFiles: TAudio[] = [];
 
-  const audioAsync = async () => {
-    audio = await getRecordedAudio(selectedAudioPath);
+  const getAudio = async () => {
+    audioFiles = await getAllRecordedAudio(
+      $selected_transcript.model_id,
+      $selected_transcript?.transcript_id
+    );
+    selectedAudio = {
+      path: $selected_transcript.selected_audio_path,
+      data: await getRecordedAudio($selected_transcript.selected_audio_path),
+    };
   };
 
-  $: selectedAudioPath && audioAsync();
+  const refetchHandler = () => {
+    getAudio();
+  };
+
+  const selectHandler = async (e: CustomEvent<TAudio>) => {
+    await updateAudioPath(e.detail.path, $selected_transcript.transcript_id);
+    selectedAudio = {
+      path: e.detail.path,
+      data: await getRecordedAudio(e.detail.path),
+    };
+    selected_transcript.update((data) => {
+      data.selected_audio_path = e.detail.path;
+      return data;
+    });
+    model_store.update((store) => {
+      store.transcript = $model_store.transcript.map((data) => {
+        if (data.transcript_id === $selected_transcript.transcript_id) {
+          return { ...data, selected_audio_path: e.detail.path };
+        } else {
+          return data;
+        }
+      });
+      return store;
+    });
+  };
+
+  $: $selected_transcript, getAudio();
 </script>
 
 <div class="window-container">
   <Transcript />
   <div class="cont">
     {#if $selected_transcript.transcript_id}
-      <Record bind:audio />
-      <SelectAudio bind:selectedAudioPath />
+      <Record bind:selectedAudio on:refetch={refetchHandler} />
+      <SelectAudio
+        bind:audioFiles
+        bind:selectedAudio
+        on:select={selectHandler}
+      />
     {/if}
   </div>
 </div>

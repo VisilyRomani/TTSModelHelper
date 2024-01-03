@@ -1,8 +1,13 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { model_store } from "./stores/selected-model";
+  import { assignModel, model_store } from "./stores/selected-model";
   import { getTranscript } from "./util/transcript";
-  import { clearModels, createModel, getModels, type TModel } from "./util/model";
+  import {
+    clearModels,
+    createModel,
+    getModels,
+    type TModel,
+  } from "./util/model";
   let input = "";
   let data: TModel[] = [];
 
@@ -19,13 +24,6 @@
   const deleteModels = async () => {
     await clearModels();
     data = await getModels();
-    console.log(data)
-    
-  };
-
-  const assignModel = async (model:TModel) => {
-    const transcripts = await getTranscript(model.id)
-    model_store.set({...model, transcript:transcripts});
   };
 </script>
 

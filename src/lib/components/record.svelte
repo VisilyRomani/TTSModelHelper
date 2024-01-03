@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { getContext, onMount } from "svelte";
   import WaveSurfer from "wavesurfer.js";
   import RecordPlugin from "wavesurfer.js/dist/plugins/record.js";
   import Pause from "../icons/pause.svelte";
@@ -9,16 +8,14 @@
   import { selected_transcript } from "../stores/selected-transcript";
   import { writeAudioFile } from "../util/audio.";
   import { transcode } from "../ffmpeg/ffmpeg";
+  import { createEventDispatcher } from "svelte";
 
-  export let audio: Blob | undefined;
+  export let selectedAudio: { path?: string; data?: Blob };
   let isRecording = false;
   let wavesurfer: WaveSurfer;
   let record: RecordPlugin;
 
-  onMount(() => {
-    createWaveSurfer(undefined);
-  });
-
+  const dispatch = createEventDispatcher();
 
   const createWaveSurfer = async (audio: Blob | undefined) => {
     if (wavesurfer) {
@@ -51,6 +48,7 @@
         if (wavesurfer) {
           wavesurfer.destroy();
         }
+        dispatch("refetch");
         wavesurfer = WaveSurfer.create({
           sampleRate: 22050,
           container: "#mic",
@@ -62,9 +60,7 @@
     });
   };
 
-  $: if (window.document && audio) {
-    createWaveSurfer(audio);
-  }
+  $: window.document, selectedAudio && createWaveSurfer(selectedAudio.data);
 
   const handleRecordPause = () => {
     if (record.isPaused()) {

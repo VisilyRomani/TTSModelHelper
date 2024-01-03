@@ -1,5 +1,6 @@
 import { db } from "../../database/db";
-import uniqid from 'uniqid';
+import uniqid from "uniqid";
+import { model_store } from "../stores/selected-model";
 
 export interface TTranscript {
   transcript_id: string;
@@ -19,7 +20,7 @@ export const importTranscript = async (
   model_id: string
 ) => {
   const audioPromise = transcript.map(async (value) => {
-    const transcript_id = uniqid()
+    const transcript_id = uniqid();
     return await db.execute(
       `INSERT INTO transcript (transcript_id ,model_id, transcript)
         VALUES(?,?,?)`,
@@ -29,10 +30,13 @@ export const importTranscript = async (
   return await Promise.all(audioPromise);
 };
 
-export const updateAudioPath = async (path:string, transcript_id:string) => {
-  return await db.execute(`
+export const updateAudioPath = async (path: string, transcript_id: string) => {
+  await db.execute(
+    `
     UPDATE transcript 
       SET selected_audio_path = $1
       WHERE transcript_id = $2
-  `, [path, transcript_id ])
-}
+  `,
+    [path, transcript_id]
+  );
+};

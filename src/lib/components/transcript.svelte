@@ -1,7 +1,7 @@
 <script lang="ts">
   import { model_store } from "../stores/selected-model";
   import { getTranscript, importTranscript } from "../util/transcript";
-import { selected_transcript } from "../stores/selected-transcript";
+  import { selected_transcript } from "../stores/selected-transcript";
 
   const handleTextFile = (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
@@ -14,9 +14,9 @@ import { selected_transcript } from "../stores/selected-transcript";
           .map((s) => s.trim())
           .filter((s) => !!s);
         if ($model_store) {
-           await importTranscript(trans, $model_store.id);
-          const transcript = await getTranscript($model_store.id)
-          model_store.set({...$model_store, transcript:transcript})
+          await importTranscript(trans, $model_store.id);
+          const transcript = await getTranscript($model_store.id);
+          model_store.set({ ...$model_store, transcript: transcript });
         }
       };
       if (e.target.files?.length) {
@@ -24,7 +24,7 @@ import { selected_transcript } from "../stores/selected-transcript";
       }
     }
   };
-  $: transcript = $model_store.transcript
+  $: transcript = $model_store.transcript;
 </script>
 
 <div class="transcript">
@@ -37,11 +37,13 @@ import { selected_transcript } from "../stores/selected-transcript";
       <button
         type="button"
         on:click={async () => {
-          selected_transcript.set(line)
+          selected_transcript.set(line);
         }}
         class={$selected_transcript?.transcript_id === line?.transcript_id
           ? "selected"
-          : ""}
+          : line?.selected_audio_path
+            ? "completed"
+            : ""}
       >
         {idx}. {line.transcript}</button
       >
@@ -57,6 +59,10 @@ import { selected_transcript } from "../stores/selected-transcript";
     flex-flow: column;
     overflow: auto;
   }
+  .completed {
+    background-color: rgb(104, 147, 104);
+  }
+
   .transcript-continer {
     gap: 0.5em;
     display: flex;
@@ -88,7 +94,7 @@ import { selected_transcript } from "../stores/selected-transcript";
     background-color: #0f0f0f69;
   }
   .selected {
-    background-color: #b0b0b098;
+    background-color: #8789da98;
   }
   button {
     text-align: left;

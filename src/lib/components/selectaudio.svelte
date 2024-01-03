@@ -1,19 +1,12 @@
 <script lang="ts">
+  import { deleteRecordedAudio, type TAudio } from "../util/audio.";
   import Trash from "../icons/delete.svelte";
-  export let selectedAudioPath: string | undefined;
-  import { deleteRecordedAudio, getAllRecordedAudio } from "../util/audio.";
+  import { createEventDispatcher } from "svelte";
   import { selected_transcript } from "../stores/selected-transcript";
-  import { updateAudioPath } from "../util/transcript";
 
-  let audioFiles: { name?: string; path: string }[] = [];
-
-  const getAudio = async () => {
-    audioFiles = await getAllRecordedAudio(
-      $selected_transcript.model_id,
-      $selected_transcript?.transcript_id
-    );
-  };
-  $: $selected_transcript && getAudio()
+  export let selectedAudio: { path?: string; data?: Blob };
+  export let audioFiles: TAudio[] = [];
+  const dispatch = createEventDispatcher<{ select: TAudio }>();
 </script>
 
 <div class="container">
@@ -22,14 +15,15 @@
       <h4>No Audio Files</h4>
     {/if}
     {#each audioFiles as file}
-      <div class="file-item {selectedAudioPath === file.path ? 'active' : ''}">
+      <div
+        class="file-item {selectedAudio?.path === file.path ? 'active' : ''}"
+      >
         <div>
           <button
             type="button"
             on:click={() => {
-              updateAudioPath(file.path, $selected_transcript.transcript_id)
-              selectedAudioPath = file.path
-              }}
+              dispatch("select", { path: file.path });
+            }}
           >
             Select
           </button>
@@ -38,8 +32,10 @@
         <button
           type="button"
           on:click={async () => {
-            await deleteRecordedAudio(file.path);
-            await getAudio();
+            await deleteRecordedAudio(
+              file.path,
+              $selected_transcript.transcript_id
+            );
           }}
         >
           <Trash fill="white" /></button
