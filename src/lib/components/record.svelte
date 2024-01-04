@@ -17,6 +17,7 @@
 
   const dispatch = createEventDispatcher();
 
+  // Creates wavesurfer audio view
   const createWaveSurfer = async (audio: Blob | undefined) => {
     if (wavesurfer) {
       wavesurfer.destroy();
@@ -99,19 +100,19 @@
   <div id="mic" />
   <div class="controls">
     <button type="button" on:click={recordPlayback}>
-      <Play />
+      <Play fill="white" />
     </button>
 
     <button type="button" on:click={handleRecordStart}>
       {#if isRecording}
-        <RecordInactive />
+        <RecordInactive fill="white" />
       {:else}
         <RecordActive fill="red" />
       {/if}
     </button>
 
     <button type="button" on:click={handleRecordPause}>
-      <Pause />
+      <Pause fill="white" />
     </button>
   </div>
 </div>

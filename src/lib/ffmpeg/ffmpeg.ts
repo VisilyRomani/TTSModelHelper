@@ -1,11 +1,9 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
-// import {createFFmpeg} from '@ffmpeg/core'
 import { toBlobURL, fetchFile } from "@ffmpeg/util";
-import { writeAudioFile } from "../util/audio.";
-import { BaseDirectory, writeBinaryFile } from "@tauri-apps/api/fs";
 
 export let ffmpeg: FFmpeg | null;
 
+// Inital load for ffmpeg.wasm
 const load = async () => {
   if (!ffmpeg) {
     console.log("loading ffmpeg");
@@ -21,6 +19,7 @@ const load = async () => {
   }
 };
 
+// converts blob audio from recoring into Signed 16 Bit PCM audio file at 22050 sample rate
 export const transcode = async (audioFile: Blob): Promise<Blob> => {
   if (ffmpeg) {
     ffmpeg.on("progress", (e) => {

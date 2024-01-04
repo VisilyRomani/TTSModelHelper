@@ -16,7 +16,8 @@
         "scope": ["**", "$APPDATA/*"]
       },
       "dialog": {
-        "save": true
+        "save": true,
+        "ask": true
       },
       "path": {
         "all": true

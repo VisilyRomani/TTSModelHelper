@@ -72,9 +72,6 @@ export const getAllRecordedAudio = async (
   return directories;
 };
 
-// currently when save it is in 8bit might need to change to 16 bit
-// const signed16BitArray = unsigned8BitArray.map(x => (x + 128) & 0xFF - 128);
-
 export const getRecordedAudio = async (
   path: string | undefined
 ): Promise<Blob | undefined> => {

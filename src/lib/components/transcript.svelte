@@ -3,6 +3,7 @@
   import { getTranscript, importTranscript } from "../util/transcript";
   import { selected_transcript } from "../stores/selected-transcript";
 
+  // splits comma seperated txt file into seperate transcripts
   const handleTextFile = (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
       const reader = new FileReader();

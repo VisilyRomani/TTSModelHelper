@@ -1,6 +1,5 @@
 import { db } from "../../database/db";
 import uniqid from "uniqid";
-import { model_store } from "../stores/selected-model";
 
 export interface TTranscript {
   transcript_id: string;

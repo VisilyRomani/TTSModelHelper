@@ -3,10 +3,10 @@
   import Trash from "../icons/delete.svelte";
   import { createEventDispatcher } from "svelte";
   import { selected_transcript } from "../stores/selected-transcript";
-  import { updateAudioPath } from "../util/transcript";
-
   export let selectedAudio: { path?: string; data?: Blob };
   export let audioFiles: TAudio[] = [];
+
+  // dispatch used to update selected audio path within parent
   const dispatch = createEventDispatcher<{ select: TAudio }>();
 </script>
 
@@ -33,7 +33,6 @@
         <button
           type="button"
           on:click={async () => {
-            // await updateAudioPath("", $selected_transcript.transcript_id);
             await deleteRecordedAudio(
               file.path,
               $selected_transcript.transcript_id
