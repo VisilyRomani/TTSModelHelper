@@ -19,6 +19,14 @@ pnpm tauri dev
 Currently this application does not support multiple speakers
 
 ## Format
+Importing transcript data requirements:
+```
+[
+    {"text":"This is an example transcript},
+    {"text":"This is an example transcript2},
+]
+```
+
 Metadata is structured with an id and transcript seperated by `|` 
 
 ```id|transcript```
