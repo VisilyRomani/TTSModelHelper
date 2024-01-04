@@ -13,7 +13,10 @@
     "allowlist": {
       "fs": {
         "all": true,
-        "scope": ["**","$APPDATA/*"]
+        "scope": ["**", "$APPDATA/*"]
+      },
+      "dialog": {
+        "save": true
       },
       "path": {
         "all": true

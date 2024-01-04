@@ -14,7 +14,13 @@
       Back
     </button>
   {/if}
-  <h1>Models</h1>
+  {#if $model_store.name}
+    <h1>
+      {$model_store.name}
+    </h1>
+  {:else}
+    <h1>Models</h1>
+  {/if}
   {#if $model_store?.id}
     <SpeechCapture />
   {:else}
