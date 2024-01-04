@@ -1,6 +1,5 @@
 import Database from "tauri-plugin-sql-api";
 export const db = await Database.load("sqlite:database.db");
-
 // Initial Database creation
 
 await db.execute(

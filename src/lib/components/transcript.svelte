@@ -29,7 +29,7 @@
               model_store.set({ ...$model_store, transcript: transcript });
             }
           } else {
-            throw Error("Invalid JSON");
+            throw Error("Invalid JSON input");
           }
         } catch (e) {
           console.log(e);
