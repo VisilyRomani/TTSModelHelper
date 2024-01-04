@@ -7,7 +7,9 @@ export default defineConfig(async () => ({
   optimizeDeps: {
     exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
   },
-
+  build: {
+    target: "esnext",
+  },
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent vite from obscuring rust errors
@@ -16,5 +18,5 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-  }
+  },
 }));
