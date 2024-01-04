@@ -1,7 +1,5 @@
-# Tauri + Svelte + Typescript
+# Introduction
 
-This template should help get you started developing with Tauri, Svelte and TypeScript in Vite.
+TTSModelHelper is used to record audio training data for rhasspy [Piper](https://github.com/rhasspy/piper) text to speach. Users can import a transcript for a model they create. Preview and listen to past audio they recorded and export all of the files into a compliant zip folder containing all of their training data 
 
-## Recommended IDE Setup
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
