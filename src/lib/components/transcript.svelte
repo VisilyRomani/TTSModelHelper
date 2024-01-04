@@ -2,21 +2,40 @@
   import { model_store } from "../stores/selected-model";
   import { getTranscript, importTranscript } from "../util/transcript";
   import { selected_transcript } from "../stores/selected-transcript";
+  import { message } from "@tauri-apps/api/dialog";
 
   const handleJsonInput = async (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
       if (e.target.files?.length) {
-        const transcriptList = JSON.parse(await e.target.files[0].text()) as {
-          text: string;
-        }[];
-
-        if ($model_store) {
-          await importTranscript(
-            transcriptList.map((t) => t.text),
-            $model_store.id
+        try {
+          const transcriptList: { text: string }[] = JSON.parse(
+            await e.target.files[0].text()
           );
-          const transcript = await getTranscript($model_store.id);
-          model_store.set({ ...$model_store, transcript: transcript });
+          if (
+            Array.isArray(transcriptList) &&
+            transcriptList.every(
+              (item) =>
+                typeof item === "object" &&
+                item.hasOwnProperty("text") &&
+                typeof item.text === "string"
+            )
+          ) {
+            if ($model_store) {
+              await importTranscript(
+                transcriptList.map((t) => t.text),
+                $model_store.id
+              );
+              const transcript = await getTranscript($model_store.id);
+              model_store.set({ ...$model_store, transcript: transcript });
+            }
+          } else {
+            throw Error("Invalid JSON");
+          }
+        } catch (e) {
+          console.log(e);
+          if (e instanceof Error) {
+            message("Error: " + e.message, { title: "Error", type: "error" });
+          }
         }
       }
     }
