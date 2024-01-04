@@ -3,25 +3,21 @@
   import { getTranscript, importTranscript } from "../util/transcript";
   import { selected_transcript } from "../stores/selected-transcript";
 
-  // splits comma seperated txt file into seperate transcripts
-  const handleTextFile = (e: Event) => {
+  const handleJsonInput = async (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
-      const reader = new FileReader();
-      reader.onload = async (evt) => {
-        const trans = String(evt.target?.result)
-          ?.replace(/\r?\n|\r/g, "")
-          .replace(/['"]+/g, "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter((s) => !!s);
+      if (e.target.files?.length) {
+        const transcriptList = JSON.parse(await e.target.files[0].text()) as {
+          text: string;
+        }[];
+
         if ($model_store) {
-          await importTranscript(trans, $model_store.id);
+          await importTranscript(
+            transcriptList.map((t) => t.text),
+            $model_store.id
+          );
           const transcript = await getTranscript($model_store.id);
           model_store.set({ ...$model_store, transcript: transcript });
         }
-      };
-      if (e.target.files?.length) {
-        reader.readAsText(e.target.files[0]);
       }
     }
   };
@@ -31,7 +27,7 @@
 <div class="transcript">
   <label class="input-file">
     Import Transcript
-    <input type="file" accept=" .txt" on:change={handleTextFile} />
+    <input type="file" accept="application/json" on:change={handleJsonInput} />
   </label>
   <div class="transcript-continer">
     {#each transcript as line, idx (idx)}
