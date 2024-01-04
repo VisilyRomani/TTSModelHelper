@@ -19,7 +19,7 @@ pnpm tauri dev
 Currently this application does not support multiple speakers
 
 ## Format
-Importing transcript data requirements:
+Importing transcript data requires a json file in this spesific format:
 ```
 [
     {"text":"This is an example transcript},
