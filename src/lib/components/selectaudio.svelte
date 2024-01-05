@@ -33,10 +33,7 @@
         <button
           type="button"
           on:click={async () => {
-            await deleteRecordedAudio(
-              file.path,
-              $selected_transcript.transcript_id
-            );
+            await deleteRecordedAudio(file.path, $selected_transcript);
             dispatch("select", { path: "" });
           }}
         >

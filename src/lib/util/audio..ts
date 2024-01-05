@@ -9,7 +9,7 @@ import {
 } from "@tauri-apps/api/fs";
 import { appDataDir } from "@tauri-apps/api/path";
 import uniqid from "uniqid";
-import { updateAudioPath } from "./transcript";
+import { updateAudioPath, type TTranscript } from "./transcript";
 
 export type TAudio = {
   name?: string;
@@ -90,11 +90,13 @@ export const getRecordedAudio = async (
 
 export const deleteRecordedAudio = async (
   path: string,
-  transcript_id: string
+  selected_transcript: TTranscript
 ) => {
   try {
     await removeFile(path);
-    await updateAudioPath("", transcript_id);
+    if (selected_transcript.selected_audio_path === path) {
+      await updateAudioPath("", selected_transcript.transcript_id);
+    }
   } catch (e) {
     console.error(e);
   }
