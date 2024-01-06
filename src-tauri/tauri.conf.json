@@ -34,11 +34,10 @@
       "targets": "all",
       "identifier": "com.visily.ttsmodelhelper",
       "icon": [
-        "icons/32x32.png",
-        "icons/128x128.png",
-        "icons/128x128@2x.png",
-        "icons/icon.icns",
-        "icons/icon.ico"
+        "icons/32.png",
+        "icons/128.png",
+        "icons/256.png",
+        "icons/ico.ico"
       ]
     },
     "security": {
@@ -48,7 +47,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "ttsmodelhelper",
+        "title": "TTS Model Helper",
         "width": 1280,
         "height": 720
       }
