@@ -21,12 +21,21 @@ export const importTranscript = async (
   const audioPromise = transcript.map(async (value) => {
     const transcript_id = uniqid();
     return await db.execute(
-      `INSERT INTO transcript (transcript_id ,model_id, transcript)
+      `INSERT INTO transcript (transcript_id, model_id, transcript)
         VALUES(?,?,?)`,
       [transcript_id, model_id, value]
     );
   });
   return await Promise.all(audioPromise);
+};
+
+export const addTranscript = async (model_id: string, value: string) => {
+  const transcript_id = uniqid();
+  return await db.execute(
+    `INSERT INTO transcript (transcript_id,model_id, transcript)
+      VALUES(?,?,?)`,
+    [transcript_id, model_id, value]
+  );
 };
 
 export const updateAudioPath = async (path: string, transcript_id: string) => {

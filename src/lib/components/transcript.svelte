@@ -1,8 +1,14 @@
 <script lang="ts">
   import { model_store } from "../stores/selected-model";
-  import { getTranscript, importTranscript } from "../util/transcript";
+  import {
+    addTranscript,
+    getTranscript,
+    importTranscript,
+  } from "../util/transcript";
   import { selected_transcript } from "../stores/selected-transcript";
   import { message } from "@tauri-apps/api/dialog";
+
+  let textData = "";
 
   const handleJsonInput = async (e: Event) => {
     if (e.target instanceof HTMLInputElement) {
@@ -40,6 +46,18 @@
       }
     }
   };
+
+  const handleSubmit = async () => {
+    if ($model_store) {
+      const test = await addTranscript($model_store.id, textData);
+      console.log(test);
+      const transcript = await getTranscript($model_store.id);
+      model_store.set({ ...$model_store, transcript: transcript });
+      textData = "";
+    } else {
+      alert("No Model selected");
+    }
+  };
   $: transcript = $model_store.transcript;
 </script>
 
@@ -48,6 +66,15 @@
     Import Transcript
     <input type="file" accept="application/json" on:change={handleJsonInput} />
   </label>
+  <div class="transcript-text">
+    <input
+      style="width: 100%;"
+      placeholder="Transcript Text"
+      type="text"
+      bind:value={textData}
+    />
+    <button type="button" on:click={handleSubmit}>Submit</button>
+  </div>
   <div class="transcript-continer">
     {#each transcript as line, idx (idx)}
       <button
@@ -68,10 +95,16 @@
 </div>
 
 <style>
+  .transcript-text {
+    display: flex;
+    gap: 0.5em;
+    width: 100%;
+    justify-content: space-between;
+  }
   .transcript {
     padding: 1em;
     display: flex;
-    gap: 1em;
+    gap: 0.5em;
     flex-flow: column;
     overflow: auto;
   }
